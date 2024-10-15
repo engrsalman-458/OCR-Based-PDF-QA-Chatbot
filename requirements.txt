@@ -1,5 +1,9 @@
-streamlit==1.26.0
-pymupdf==1.22.3
-pytesseract==0.3.10
-Pillow==9.3.0
+streamlit
+pymupdf
+pytesseract pillow
 groq
+tesseract-ocr
+fitz  # PyMuPDF for PDF handling
+pytesseract
+PIL 
+io
