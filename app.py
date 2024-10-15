@@ -1,20 +1,34 @@
 import streamlit as st
-import pdfplumber  # Updated to use pdfplumber for PDF handling
+import pdfplumber
+import pytesseract
+from PIL import Image
+import io
 from groq import Groq
 import os
 
 # Step 1: Set up API key for Groq
 api_key = st.secrets["api_key"]
 
-# Step 2: Function to extract text from PDF
+# Step 2: Function to extract text from PDF with OCR fallback
 def extract_text_from_pdf(pdf_file):
+    extracted_text = ""
+    
+    # Try extracting text using pdfplumber
     with pdfplumber.open(pdf_file) as pdf:
-        text = ""
         for page in pdf.pages:
             page_text = page.extract_text()
-            if page_text:  # Check if there's text on the page
-                text += page_text
-    return text
+            if page_text:  # If text is found, add it to the extracted_text
+                extracted_text += page_text
+            else:  # If no text found, use OCR
+                # Convert PDF page to an image for OCR
+                img = page.to_image()
+                pil_image = img.original  # Get the PIL image
+                
+                # Use Tesseract OCR to extract text from the image
+                text = pytesseract.image_to_string(pil_image)
+                extracted_text += text
+
+    return extracted_text
 
 # Step 3: Initialize Groq API Client
 client = Groq(api_key=api_key)
@@ -48,7 +62,7 @@ if pdf_file:
     # Button to extract and summarize text
     if st.button("Summarize PDF"):
         extracted_text = extract_text_from_pdf(pdf_file)
-        if extracted_text:  # Check if any text was extracted
+        if extracted_text.strip():  # Check if any text was extracted
             st.subheader("Extracted Text from PDF")
             st.write(extracted_text)
         else:
