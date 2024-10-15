@@ -1,4 +1,4 @@
-streamlit==1.26.0
+streamlit
 pdfplumber
-Pillow==9.3.0
+Pillow
 groq
