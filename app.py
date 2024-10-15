@@ -1,9 +1,9 @@
 import streamlit as st
 import pdfplumber  # Updated to use pdfplumber for PDF handling
 from groq import Groq
+import os
 
 # Step 1: Set up API key for Groq
-import os
 api_key = st.secrets["api_key"]
 
 # Step 2: Function to extract text from PDF
@@ -11,11 +11,13 @@ def extract_text_from_pdf(pdf_file):
     with pdfplumber.open(pdf_file) as pdf:
         text = ""
         for page in pdf.pages:
-            text += page.extract_text()
+            page_text = page.extract_text()
+            if page_text:  # Check if there's text on the page
+                text += page_text
     return text
 
 # Step 3: Initialize Groq API Client
-client = Groq(api_key=os.environ.get("api_key"))
+client = Groq(api_key=api_key)
 
 # Step 4: Function to query the LLM
 def query_llm(prompt, context):
@@ -36,6 +38,9 @@ st.title("PDF AI Chatbot with Summary and Q&A")
 # Step 6: Upload PDF
 pdf_file = st.file_uploader("Upload a PDF", type="pdf")
 
+# Initialize extracted_text
+extracted_text = ""
+
 # Step 7: Summary and Q&A functionality
 if pdf_file:
     st.write("PDF uploaded successfully!")
@@ -43,9 +48,12 @@ if pdf_file:
     # Button to extract and summarize text
     if st.button("Summarize PDF"):
         extracted_text = extract_text_from_pdf(pdf_file)
-        st.subheader("Extracted Text from PDF")
-        st.write(extracted_text)
-    
+        if extracted_text:  # Check if any text was extracted
+            st.subheader("Extracted Text from PDF")
+            st.write(extracted_text)
+        else:
+            st.warning("No text found in the PDF.")
+
     # Text input to ask a question
     user_query = st.text_input("Ask a question about the PDF content:")
     
@@ -54,6 +62,5 @@ if pdf_file:
         response = query_llm(user_query, extracted_text)
         st.subheader("AI Response")
         st.write(response)
-
-
-
+    elif user_query:  # If user has entered a query but no text is extracted
+        st.warning("Please summarize the PDF first before asking questions.")
