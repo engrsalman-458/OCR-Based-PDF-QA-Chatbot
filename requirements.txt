@@ -1,4 +1,5 @@
 streamlit
-pdfplumber
+#pdfplumber
+PyMuPDF 
 Pillow
 groq
