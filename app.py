@@ -54,7 +54,7 @@ def query_llm(prompt, context):
     return chat_completion.choices[0].message.content
 
 # Step 6: Streamlit GUI
-st.title("PDF AI Chatbot with Summary and Q&A")
+st.title("OCR Based PDF AI Chatbot and Q&A")
 
 # Step 7: Upload PDF
 pdf_file = st.file_uploader("Upload a PDF", type="pdf")
@@ -64,9 +64,9 @@ if pdf_file:
     st.write("PDF uploaded successfully!")
     
     # Extract text from the PDF immediately
-    extracted_text = extract_text_from_pdf_images(pdf_file)
-    st.subheader("Extracted Text from PDF Images")
-    st.write(extracted_text)
+    # extracted_text = extract_text_from_pdf_images(pdf_file)
+    # st.subheader("Extracted Text from PDF Images")
+    # st.write(extracted_text)
 
     # Text input to ask a question
     user_query = st.text_input("Ask a question about the PDF content:")
