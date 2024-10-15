@@ -1,6 +1,5 @@
-streamlit
-pdfplumber
+PyMuPDF
 pytesseract
 Pillow
 groq
-fitz
+streamlit
