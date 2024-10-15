@@ -4,3 +4,4 @@ PyMuPDF
 Pillow
 groq
 pytesseract 
+tesseract-ocr
