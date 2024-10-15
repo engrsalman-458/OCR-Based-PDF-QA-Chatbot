@@ -1,6 +1,6 @@
 streamlit
 pymupdf
-pytesseract pillow
+pytesseract
 groq
 tesseract-ocr
 fitz  # PyMuPDF for PDF handling
