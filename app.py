@@ -1,20 +1,32 @@
+import os
 import streamlit as st
+import pytesseract
+from PIL import Image
+import io
 import pdfplumber
 from groq import Groq
-import os
 
-# Step 1: Set up API key for Groq
+# Step 1: Set up the API key for Groq
 api_key = st.secrets["api_key"]
 
-# Step 2: Function to extract text from PDF
+# Configure pytesseract to use the installed Tesseract executable
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Adjust the path as necessary
+
+# Step 2: Function to extract text from images within a PDF
 def extract_text_from_pdf(pdf_file):
+    extracted_text = ""
     with pdfplumber.open(pdf_file) as pdf:
-        text = ""
         for page in pdf.pages:
+            # Try to extract text directly
             page_text = page.extract_text()
             if page_text:
-                text += page_text
-    return text
+                extracted_text += page_text
+            else:
+                # If no text found, convert the page to an image and use OCR
+                image = page.to_image(resolution=300)
+                pil_image = image.original.convert("RGB")
+                extracted_text += pytesseract.image_to_string(pil_image)
+    return extracted_text
 
 # Step 3: Initialize Groq API Client
 client = Groq(api_key=api_key)
@@ -33,43 +45,29 @@ def query_llm(prompt, context):
     return chat_completion.choices[0].message.content
 
 # Step 5: Streamlit GUI
-st.title("PDF AI Chatbot with Summary and Q&A")
+st.title("OCR-based PDF AI Chatbot")
 
 # Step 6: Upload PDF
 pdf_file = st.file_uploader("Upload a PDF", type="pdf")
 
-# Initialize extracted_text
-extracted_text = ""
-
-# Step 7: Extract text when the PDF is uploaded
+# Step 7: Summary and Q&A functionality
 if pdf_file:
     st.write("PDF uploaded successfully!")
-    
-    # Extract text from the PDF immediately upon upload
-    extracted_text = extract_text_from_pdf(pdf_file)
-    if extracted_text.strip():  # Check if any text was extracted
-        st.subheader("Extracted Text from PDF (not summarized)")
-        st.write(extracted_text)
-    else:
-        st.warning("No text found in the PDF.")
 
-    # Button to summarize text
-    if st.button("Summarize PDF"):
+    # Button to extract text from PDF
+    if st.button("Extract Text"):
+        extracted_text = extract_text_from_pdf(pdf_file)
         if extracted_text:
-            # Query the LLM with the extracted text for summarization
-            summary_response = query_llm("Please summarize the following text:", extracted_text)
-            st.subheader("Summary")
-            st.write(summary_response)
+            st.subheader("Extracted Text from PDF")
+            st.write(extracted_text)
         else:
-            st.warning("No text available to summarize.")
-    
+            st.write("No text found in the PDF.")
+
     # Text input to ask a question
     user_query = st.text_input("Ask a question about the PDF content:")
-    
-    if user_query and extracted_text:
+
+    if user_query and 'extracted_text' in locals() and extracted_text:
         # Query the LLM with the extracted text and user question
         response = query_llm(user_query, extracted_text)
         st.subheader("AI Response")
         st.write(response)
-    elif user_query:  # If user has entered a query but no text is extracted
-        st.warning("No text available for answering the question.")
