@@ -65,7 +65,7 @@ if pdf_file:
     
     # Extract text from the PDF immediately
      extracted_text = extract_text_from_pdf_images(pdf_file)
-    # st.subheader("Extracted Text from PDF Images")
+     st.subheader("Extracted Text from PDF Images")
     # st.write(extracted_text)
 
     # Text input to ask a question
