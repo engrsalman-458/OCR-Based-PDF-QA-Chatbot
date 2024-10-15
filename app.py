@@ -4,7 +4,6 @@ from groq import Groq
 
 # Step 1: Set up API key for Groq
 import os
-
 api_key = st.secrets["api_key"]
 
 
@@ -37,6 +36,9 @@ st.title("PDF AI Chatbot with Summary and Q&A")
 # Step 6: Upload PDF
 pdf_file = st.file_uploader("Upload a PDF", type="pdf")
 
+# Variable to hold the extracted text
+extracted_text = None
+
 # Step 7: Summary and Q&A functionality
 if pdf_file:
     st.write("PDF uploaded successfully!")
@@ -50,9 +52,11 @@ if pdf_file:
     # Text input to ask a question
     user_query = st.text_input("Ask a question about the PDF content:")
     
-    if user_query:
+    # Only allow asking a question if extracted_text is not None
+    if user_query and extracted_text:
         # Query the LLM with the extracted text and user question
         response = query_llm(user_query, extracted_text)
         st.subheader("AI Response")
         st.write(response)
-
+    elif user_query and extracted_text is None:
+        st.error("Please summarize the PDF before asking a question.")
