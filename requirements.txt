@@ -2,3 +2,10 @@ streamlit
 pymupdf
 pytesseract pillow
 groq
+tesseract-ocr
+ fitz  # PyMuPDF for PDF handling
+
+import pytesseract
+from PIL import Image
+import io
+from groq import Groq
