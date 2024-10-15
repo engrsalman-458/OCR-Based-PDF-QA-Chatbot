@@ -1,11 +1,3 @@
-#streamlit
-#PyMuPDF 
-#Pillow
-#groq
-#pytesseract 
-#tesseract-ocr
-
-
 streamlit==1.26.0
 pdfplumber==0.5.28
 pytesseract==0.3.10
