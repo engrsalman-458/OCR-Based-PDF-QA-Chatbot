@@ -7,7 +7,7 @@ from groq import Groq
 import os
 
 # Step 1: Set up API key for Groq
-api_key = st.secrets["api_key"]  # Make sure to set your API key in Streamlit secrets
+api_key = st.secrets["api_key"]  # Ensure the API key is set in Streamlit secrets
 
 # Step 2: Configure pytesseract for OCR
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
@@ -59,14 +59,12 @@ st.title("OCR Based PDF AI Chatbot and Q&A")
 # Step 7: Upload PDF
 pdf_file = st.file_uploader("Upload a PDF", type="pdf")
 
-# Step 8: Automatically extract text when a PDF is uploaded
+# Step 8: Automatically extract text when a PDF is uploaded but don't display it
 if pdf_file:
     st.write("PDF uploaded successfully!")
     
     # Extract text from the PDF immediately
-     extracted_text = extract_text_from_pdf_images(pdf_file)
-     st.subheader("Extracted Text from PDF Images")
-    # st.write(extracted_text)
+    extracted_text = extract_text_from_pdf_images(pdf_file)
 
     # Text input to ask a question
     user_query = st.text_input("Ask a question about the PDF content:")
@@ -76,3 +74,8 @@ if pdf_file:
         response = query_llm(user_query, extracted_text)
         st.subheader("AI Response")
         st.write(response)
+
+    # Option to display the extracted text if the user wants
+    if st.button("Show Extracted Text"):
+        st.subheader("Extracted Text from PDF Images")
+        st.write(extracted_text)
