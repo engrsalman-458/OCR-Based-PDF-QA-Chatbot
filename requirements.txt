@@ -3,4 +3,4 @@ pytesseract
 Pillow
 groq
 streamlit
-sentence-transformers
+
